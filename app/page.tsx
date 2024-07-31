@@ -1,7 +1,26 @@
+"use client";
 import Image from "next/image";
 import Navbar from "../components/Navbar";
+import React, { useState } from "react";
+import { FileUploader } from "react-drag-drop-files";
 
 export default function Home() {
+  const fileTypes = ["JPG", "PNG"];
+  const [idImage, setIdImage] = useState(null);
+  function DragDrop() {
+    const handleChange = (idImage: any) => {
+      setIdImage(idImage);
+    };
+    return (
+      <FileUploader
+        handleChange={handleChange}
+        name="idImage"
+        types={fileTypes}
+      />
+    );
+  }
+  console.log(idImage);
+
   return (
     <main className="flex min-h-screen w-full flex-col items-center p-4 bg-probgclr">
       <Navbar />
@@ -126,7 +145,11 @@ export default function Home() {
             </button>
           </form>
         </div>
-        <div className="flex flex-col w-2/4">test</div>
+        <div className="flex flex-col w-2/4">
+          test
+          <DragDrop />
+          {/* <Image src="" alt="image" width={300} height={300} /> */}
+        </div>
       </div>
     </main>
   );
