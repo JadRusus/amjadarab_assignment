@@ -2,12 +2,67 @@
 import Image from "next/image";
 import Navbar from "../components/Navbar";
 import React, { useState } from "react";
-import Tesseract from "tesseract.js";
+import { OpenAI } from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+});
 
 export default function Home() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [extractedText, setExtractedText] = useState<string>("");
+  const [analysisResult, setAnalysisResult] = useState<string>("");
+  const [extractedData, setExtractedData] = useState<ExtractedData | null>(
+    null
+  );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  interface ExtractedData {
+    surname: string;
+    givenName: string;
+    dob: string;
+    nationality: string;
+    documentNo: string;
+    dateOfIssue: string;
+    dateOfExpiry: string;
+    sex: string;
+  }
 
+  const parseExtractedData = (text: string): ExtractedData => {
+    const lines = text.split("\n");
+    const data: Partial<ExtractedData> = {};
+
+    lines.forEach((line) => {
+      const [key, value] = line.split(":").map((s) => s.trim());
+      switch (key.toLowerCase()) {
+        case "surname":
+          data.surname = value;
+          break;
+        case "givenname":
+          data.givenName = value;
+          break;
+        case "date of birth":
+          data.dob = value;
+          break;
+        case "nationality":
+          data.nationality = value;
+          break;
+        case "document number":
+          data.documentNo = value;
+          break;
+        case "date of issue":
+          data.dateOfIssue = value;
+          break;
+        case "date of expiry":
+          data.dateOfExpiry = value;
+          break;
+        case "sex":
+          data.sex = value;
+          break;
+      }
+    });
+
+    return data as ExtractedData;
+  };
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -15,15 +70,53 @@ export default function Home() {
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setUploadedImage(imageUrl);
+      setIsLoading(true);
 
       try {
-        const result = await Tesseract.recognize(file);
-        setExtractedText(result.data.text);
+        // Convert the file to base64
+        const base64Image = await fileToBase64(file);
+
+        // Call GPT-4 Vision API
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "user",
+              content: [
+                {
+                  type: "text",
+                  text: "Analyze this image and extract text based on these values: surname, givenName, date of birth, nationality, document Number, date Of Issue, date Of Expiry, sex. and don't add any other text to the response",
+                },
+                { type: "image_url", image_url: { url: base64Image } },
+              ],
+            },
+          ],
+        });
+        const extractedText = response.choices[0]?.message?.content || "";
+        const parsedData = parseExtractedData(extractedText);
+        setExtractedData(parsedData);
+
+        setAnalysisResult(
+          response.choices[0]?.message?.content || "No analysis result"
+        );
       } catch (error) {
-        console.error("Error performing OCR:", error);
-        setExtractedText("Error extracting text from image");
+        console.error("Error analyzing image:", error);
+        setAnalysisResult("Error analyzing image");
+        setExtractedData(null);
+      } finally {
+        setIsLoading(false);
       }
     }
+  };
+
+  // Helper function to convert File to base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
   };
   return (
     <main className="flex min-h-screen w-full flex-col items-center p-4 bg-probgclr">
@@ -41,7 +134,9 @@ export default function Home() {
                     type="text"
                     id="surname"
                     name="surname"
-                    // placeholder={fields.surname || "Surname"}
+                    placeholder={
+                      extractedData ? extractedData.surname : "Surname"
+                    }
                     className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
                     required
                   />
@@ -54,7 +149,9 @@ export default function Home() {
                     type="text"
                     id="givenName"
                     name="givenName"
-                    // placeholder={fields.givenName || "Given Name"}
+                    placeholder={
+                      extractedData ? extractedData.givenName : "Given Name"
+                    }
                     className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
                     required
                   />
@@ -64,10 +161,12 @@ export default function Home() {
                     Date of Birth <span className="text-red-400">*</span>
                   </span>
                   <input
-                    type="date"
+                    type="text"
                     id="dob"
                     name="dob"
-                    // placeholder={fields.dob || "Date of Birth"}
+                    placeholder={
+                      extractedData ? extractedData.dob : "Date of Birth"
+                    }
                     className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
                     required
                   />
@@ -80,7 +179,9 @@ export default function Home() {
                     type="text"
                     id="nationality"
                     name="nationality"
-                    // placeholder={fields.nationality || "Nationality"}
+                    placeholder={
+                      extractedData ? extractedData.nationality : "Nationality"
+                    }
                     className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
                     required
                   />
@@ -95,7 +196,9 @@ export default function Home() {
                     type="text"
                     id="documentNo"
                     name="documentNo"
-                    // placeholder={fields.documentNo || "Document No."}
+                    placeholder={
+                      extractedData ? extractedData.documentNo : "Document No."
+                    }
                     className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
                     required
                   />
@@ -105,10 +208,14 @@ export default function Home() {
                     Date of Issue <span className="text-red-400">*</span>
                   </span>
                   <input
-                    type="date"
+                    type="text"
                     id="dateOfIssue"
                     name="dateOfIssue"
-                    // placeholder={fields.dateOfIssue || "Date of Issue"}
+                    placeholder={
+                      extractedData
+                        ? extractedData.dateOfIssue
+                        : "Date of Issue"
+                    }
                     className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
                     required
                   />
@@ -118,10 +225,14 @@ export default function Home() {
                     Date of Expiry <span className="text-red-400">*</span>
                   </span>
                   <input
-                    type="date"
+                    type="text"
                     id="dateOfExpiry"
                     name="dateOfExpiry"
-                    // placeholder={fields.dateOfExpiry || "Date of Expiry"}
+                    placeholder={
+                      extractedData
+                        ? extractedData.dateOfExpiry
+                        : "Date of Expiry"
+                    }
                     className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
                     required
                   />
@@ -134,7 +245,7 @@ export default function Home() {
                     type="text"
                     id="sex"
                     name="sex"
-                    // placeholder={fields.sex || "Sex"}
+                    placeholder={extractedData ? extractedData.sex : "Sex"}
                     className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
                     required
                   />
@@ -166,12 +277,7 @@ export default function Home() {
               className="text-white "
             />
           )}
-          {extractedText && (
-            <div className="mt-4">
-              <h3 className="text-profontclr font-bold">Extracted Text:</h3>
-              <p className="text-proaccclr">{extractedText}</p>
-            </div>
-          )}
+          {isLoading && <p className="text-proaccclr">Analyzing image...</p>}
         </div>
       </div>
     </main>
