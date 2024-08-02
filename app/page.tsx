@@ -249,7 +249,7 @@ export default function Home() {
             </button>
           </form>
         </div>
-        <div className="flex flex-col max-lg:w-full max-lg:mt-6 w-2/4  max-sm:pr-0  pr-24">
+        <div className="flex flex-col max-lg:w-full max-lg:mb-6 w-2/4  max-sm:pr-0  pr-24">
           <h2 className="text-profontclr  mb-4">Upload your ID card</h2>
           <input
             type="file"
