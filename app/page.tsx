@@ -120,11 +120,11 @@ export default function Home() {
   return (
     <main className="flex min-h-screen w-full flex-col items-center p-4 bg-probgclr">
       <Navbar />
-      <div className="mt-4 flex flex-row justify-between w-10/12 font-bold">
-        <div className="flex flex-col w-2/4">
-          <form className=" w-10/12 space-y-4 ">
-            <div className="flex flex-row justify-between">
-              <div className="flex flex-col space-y-4">
+      <div className="mt-4 flex flex-row  max-lg:flex-col justify-between w-10/12 font-bold">
+        <div className="flex flex-col max-lg:w-full w-2/4">
+          <form className="space-y-4 max-sm:pr-0 pr-24">
+            <div className="flex flex-row max-sm:flex-col max-md:justify-between">
+              <div className="flex flex-col space-y-4 mr-10 max-sm:mr-0">
                 <label className="block">
                   <span className="text-profontclr">
                     Surname <span className="text-red-400">*</span>
@@ -249,7 +249,8 @@ export default function Home() {
             </button>
           </form>
         </div>
-        <div className="flex flex-col w-2/4">
+        <div className="flex flex-col max-lg:w-full max-lg:mt-6 w-2/4  max-sm:pr-0  pr-24">
+          <h2 className="text-profontclr  mb-4">Upload your ID card</h2>
           <input
             type="file"
             onChange={handleImageUpload}
