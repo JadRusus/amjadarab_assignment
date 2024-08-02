@@ -120,7 +120,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen w-full flex-col items-center p-4 bg-probgclr">
       <Navbar />
-      <div className="mt-4 flex flex-row  max-lg:flex-col justify-between w-10/12 font-bold">
+      <div className="mt-4 flex flex-row  max-lg:flex-col-reverse justify-between w-10/12 font-bold">
         <div className="flex flex-col max-lg:w-full w-2/4">
           <form className="space-y-4 max-sm:pr-0 pr-24">
             <div className="flex flex-row max-sm:flex-col max-md:justify-between">
