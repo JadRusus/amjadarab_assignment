@@ -73,10 +73,10 @@ export default function Home() {
       setIsLoading(true);
 
       try {
-        // Convert the file to base64
+        // Converting the file to base64
         const base64Image = await fileToBase64(file);
 
-        // Call GPT-4 Vision API
+        // Calling GPT-4 Vision API
         const response = await openai.chat.completions.create({
           model: "gpt-4o-mini",
           messages: [
@@ -85,7 +85,7 @@ export default function Home() {
               content: [
                 {
                   type: "text",
-                  text: "Analyze this image and extract text based on these values: surname, givenName, date of birth, nationality, document Number, date Of Issue, date Of Expiry, sex. and don't add any other text to the response",
+                  text: "Analyze this image of an ID card and extract text based on these values: surname, givenName, date of birth, nationality, document Number, date Of Issue, date Of Expiry, sex. Note that the ID card can be in any language and you have to translate it to english and send the English text only without adding any other text to the response",
                 },
                 { type: "image_url", image_url: { url: base64Image } },
               ],
@@ -109,7 +109,6 @@ export default function Home() {
     }
   };
 
-  // Helper function to convert File to base64
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -134,10 +133,9 @@ export default function Home() {
                     type="text"
                     id="surname"
                     name="surname"
-                    placeholder={
-                      extractedData ? extractedData.surname : "Surname"
-                    }
-                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
+                    placeholder="Surname"
+                    value={extractedData ? extractedData.surname : ""}
+                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder:text-profontclr"
                     required
                   />
                 </label>
@@ -149,10 +147,9 @@ export default function Home() {
                     type="text"
                     id="givenName"
                     name="givenName"
-                    placeholder={
-                      extractedData ? extractedData.givenName : "Given Name"
-                    }
-                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
+                    placeholder="Given Name"
+                    value={extractedData ? extractedData.givenName : ""}
+                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder:text-profontclr"
                     required
                   />
                 </label>
@@ -164,10 +161,9 @@ export default function Home() {
                     type="text"
                     id="dob"
                     name="dob"
-                    placeholder={
-                      extractedData ? extractedData.dob : "Date of Birth"
-                    }
-                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
+                    placeholder="Date of Birth"
+                    value={extractedData ? extractedData.dob : ""}
+                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder:text-profontclr"
                     required
                   />
                 </label>
@@ -179,10 +175,9 @@ export default function Home() {
                     type="text"
                     id="nationality"
                     name="nationality"
-                    placeholder={
-                      extractedData ? extractedData.nationality : "Nationality"
-                    }
-                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
+                    placeholder="Nationality"
+                    value={extractedData ? extractedData.nationality : ""}
+                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder:text-profontclr"
                     required
                   />
                 </label>
@@ -196,10 +191,9 @@ export default function Home() {
                     type="text"
                     id="documentNo"
                     name="documentNo"
-                    placeholder={
-                      extractedData ? extractedData.documentNo : "Document No."
-                    }
-                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
+                    placeholder="Document No."
+                    value={extractedData ? extractedData.documentNo : ""}
+                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder:text-profontclr"
                     required
                   />
                 </label>
@@ -211,12 +205,9 @@ export default function Home() {
                     type="text"
                     id="dateOfIssue"
                     name="dateOfIssue"
-                    placeholder={
-                      extractedData
-                        ? extractedData.dateOfIssue
-                        : "Date of Issue"
-                    }
-                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
+                    placeholder="Date of Issue"
+                    value={extractedData ? extractedData.dateOfIssue : ""}
+                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder:text-profontclr"
                     required
                   />
                 </label>
@@ -228,12 +219,9 @@ export default function Home() {
                     type="text"
                     id="dateOfExpiry"
                     name="dateOfExpiry"
-                    placeholder={
-                      extractedData
-                        ? extractedData.dateOfExpiry
-                        : "Date of Expiry"
-                    }
-                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
+                    placeholder="Date of Expiry"
+                    value={extractedData ? extractedData.dateOfExpiry : ""}
+                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder:text-profontclr"
                     required
                   />
                 </label>
@@ -245,8 +233,9 @@ export default function Home() {
                     type="text"
                     id="sex"
                     name="sex"
-                    placeholder={extractedData ? extractedData.sex : "Sex"}
-                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder-proaccclr"
+                    placeholder="Sex"
+                    value={extractedData ? extractedData.sex : ""}
+                    className="mt-1 block w-full h-8 bg-probgclr border-2 border-profontclr rounded-md shadow-sm px-2 py-6 text-proaccclr placeholder:text-profontclr"
                     required
                   />
                 </label>
